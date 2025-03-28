@@ -1,0 +1,8 @@
+.login-logo img {
+    max-width: 150px; /* Ajusta el tamaño según tus necesidades */
+    height: auto; /* Mantiene la proporción del logo */
+}
+.brand-link .brand-image {
+    max-width: 200px; /* Ajusta el tamaño según tus necesidades */
+    height: auto; /* Mantiene la proporción del logo */
+}
