@@ -56,7 +56,7 @@ ROOT_URLCONF = 'gestor_competitividad.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [BASE_DIR / "template"],  # Asegúrate de que esta línea esté configurada
+        'DIRS': [BASE_DIR / "templates"],  # Asegúrate de que esta línea esté configurada
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
