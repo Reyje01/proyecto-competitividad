@@ -17,9 +17,11 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include
 from django.conf.urls.i18n import i18n_patterns
+from core.views import dashboard_view
 
 urlpatterns = [
-    path('i18n/', include('django.conf.urls.i18n')),  # Agrega esta línea para incluir las URLs de internacionalización
+    path('i18n/', include('django.conf.urls.i18n')),
+    path('admin/dashboard/', dashboard_view, name='admin_dashboard'),
 ]
 
 urlpatterns += i18n_patterns(

@@ -98,11 +98,11 @@ class ValorCuantitativo(models.Model):
 
 class IndiceIndicador(models.Model):
     idindice_indicador = models.AutoField(primary_key=True, serialize=False)
-    fecha_ii = models.DateField(auto_now_add = True, serialize=False)
+    fecha_ii = models.DateField(auto_now_add=True, serialize=False)
     valor_ii = models.FloatField(blank=True, null=True)
     clasificacion_ii = models.CharField(max_length=45, blank=True, null=True)
-    idindicador = models.ForeignKey(Indicador, on_delete=models.CASCADE, db_column='idindicador', blank=True, null=True)
-    idunidad_analisis = models.ForeignKey(Registro, on_delete=models.CASCADE, db_column='idunidad_analisis', blank=True, null=True)
+    idindicador = models.ForeignKey(Indicador, on_delete=models.CASCADE, db_column='idindicador')
+    idunidad_analisis = models.ForeignKey(UnidadAnalisis, on_delete=models.CASCADE, db_column='idunidad_analisis')
 
     def __str__(self):
         text = "{0} ({1})"
@@ -114,11 +114,11 @@ class IndiceIndicador(models.Model):
 
 class IndicePilar(models.Model):
     idindice_pilar = models.AutoField(primary_key=True, serialize=False)
-    fecha_ip = models.DateField(auto_now_add = True, serialize=False)
+    fecha_ip = models.DateField(auto_now_add=True, serialize=False)
     valor_ip = models.FloatField(blank=True, null=True)
     clasificacion_ip = models.CharField(max_length=45, blank=True, null=True)
-    idpilar = models.ForeignKey(Indicador,on_delete=models.CASCADE, db_column='idpilar', blank=True, null=True)
-    idunidad_analisis = models.ForeignKey(IndiceIndicador, on_delete=models.CASCADE, db_column='idunidad_analisis', blank=True, null=True)
+    idpilar = models.ForeignKey(Pilar, on_delete=models.CASCADE, db_column='idpilar')
+    idunidad_analisis = models.ForeignKey(UnidadAnalisis, on_delete=models.CASCADE, db_column='idunidad_analisis')
 
     def __str__(self):
         text = "{0} ({1})"
@@ -130,10 +130,10 @@ class IndicePilar(models.Model):
 
 class IndiceGeneral(models.Model):
     idindice_general = models.AutoField(primary_key=True, serialize=False)
-    fecha_ig = models.DateField(auto_now_add = True, serialize=False)
+    fecha_ig = models.DateField(auto_now_add=True, serialize=False)
     valor_ig = models.FloatField(blank=True, null=True)
     clasificacion_ig = models.CharField(max_length=45, blank=True, null=True)
-    idunidad_analisis = models.ForeignKey(IndicePilar, on_delete=models.CASCADE, db_column='idunidad_analisis', blank=True, null=True)
+    idunidad_analisis = models.ForeignKey(UnidadAnalisis, on_delete=models.CASCADE, db_column='idunidad_analisis')
 
     def __str__(self):
         text = "{0} ({1})"

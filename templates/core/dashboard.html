@@ -1,0 +1,139 @@
+{% extends "admin/base_site.html" %}
+{% load static %}
+
+{% block extrastyle %}
+{{ block.super }}
+<style>
+    .dashboard-container {
+        padding: 30px;
+        background: white;
+        border-radius: 0.5rem;
+        box-shadow: 0 0 15px rgba(0, 0, 0, 0.05);
+        margin-bottom: 2rem;
+    }
+    .filters {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 1rem;
+        margin-bottom: 2rem;
+    }
+    .filter-group {
+        display: flex;
+        flex-direction: column;
+        min-width: 220px;
+    }
+    .filter-group label {
+        font-weight: 500;
+        margin-bottom: 5px;
+    }
+    select.form-control {
+        border-radius: 0.25rem;
+    }
+    .chart-container {
+        position: relative;
+        height: 320px;
+        width: 100%;
+    }
+    .panel {
+        background: #f4f6f9;
+        border-radius: 0.5rem;
+        padding: 1.5rem;
+        margin-bottom: 2rem;
+        border: 1px solid #dee2e6;
+    }
+    .panel h3 {
+        font-size: 1.25rem;
+        font-weight: 600;
+        margin-bottom: 1rem;
+        color: #343a40;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="dashboard-container">
+    <h1 class="mb-4 text-primary">Dashboard de Competitividad</h1>
+    <form method="get" id="filterForm" class="filters">
+        {% for field in filter_fields %}
+            <div class="filter-group">
+                <label for="{{ field.name }}">{{ field.label }}:</label>
+                <select id="{{ field.name }}" name="{{ field.name }}" class="form-control">
+                    <option value="">Todos</option>
+                    {% for option in field.options %}
+                        <option value="{{ option.id }}" {% if field.value == option.id|stringformat:"s" %}selected{% endif %}>{{ option.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+        {% endfor %}
+    </form>
+
+    {{ data_indicador|json_script:"dataIndicador" }}
+    {{ data_pilar|json_script:"dataPilar" }}
+    {{ data_general|json_script:"dataGeneral" }}
+
+    <div class="panel">
+        <h3>Índice Indicador</h3>
+        <div class="chart-container">
+            <canvas id="chartIndiceIndicador"></canvas>
+        </div>
+    </div>
+    <div class="panel">
+        <h3>Índice Pilar</h3>
+        <div class="chart-container">
+            <canvas id="chartIndicePilar"></canvas>
+        </div>
+    </div>
+    <div class="panel">
+        <h3>Índice General</h3>
+        <div class="chart-container">
+            <canvas id="chartIndiceGeneral"></canvas>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extrahead %}
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+$(document).ready(function() {
+    $('select').change(function() {
+        $('#filterForm').submit();
+    });
+});
+</script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+function createChart(elementId, dataId, label, color) {
+    const ctx = document.getElementById(elementId).getContext('2d');
+    const data = JSON.parse(document.getElementById(dataId).textContent);
+    new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: data.labels,
+            datasets: [{
+                label: label,
+                data: data.values,
+                backgroundColor: `rgba(${color}, 0.1)`,
+                borderColor: `rgba(${color}, 1)`,
+                borderWidth: 2,
+                tension: 0.3,
+                fill: true
+            }]
+        },
+        options: {
+            responsive: true,
+            scales: {
+                y: { beginAtZero: true, title: { display: true, text: 'Valor del Índice' } },
+                x: { title: { display: true, text: 'Fecha' } }
+            }
+        }
+    });
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    createChart('chartIndiceIndicador', 'dataIndicador', 'Índice Indicador', '54, 162, 235');
+    createChart('chartIndicePilar', 'dataPilar', 'Índice Pilar', '255, 99, 132');
+    createChart('chartIndiceGeneral', 'dataGeneral', 'Índice General', '75, 192, 192');
+});
+</script>
+{% endblock %}

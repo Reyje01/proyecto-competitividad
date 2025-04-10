@@ -171,7 +171,7 @@ JAZZMIN_SETTINGS = {
 
     # Links to put along the top menu
     "topmenu_links": [
-
+        {"name": "Gráficas", "url": "admin_dashboard", "permissions": ["auth.view_user"]},
         # Url that gets reversed (Permissions can be added)
         {"name": "Home",  "url": "admin:index", "permissions": ["auth.view_user"]},
 
@@ -276,29 +276,29 @@ JAZZMIN_UI_TWEAKS = {
     "body_small_text": False,
     "brand_small_text": False,
     "brand_colour": False,
-    "accent": "accent-primary",
+    "accent": "accent-navy",
     "navbar": "navbar-white navbar-light",
     "no_navbar_border": True,
-    "navbar_fixed": True,
+    "navbar_fixed": False,
     "layout_boxed": False,
     "footer_fixed": False,
-    "sidebar_fixed": False,
+    "sidebar_fixed": True,
     "sidebar": "sidebar-dark-primary",
     "sidebar_nav_small_text": False,
     "sidebar_disable_expand": False,
     "sidebar_nav_child_indent": False,
     "sidebar_nav_compact_style": False,
-    "sidebar_nav_legacy_style": False,
-    "sidebar_nav_flat_style": False,
+    "sidebar_nav_legacy_style": True,
+    "sidebar_nav_flat_style": True,
     "theme": "flatly",
-    "dark_mode_theme": "superhero",
+    "dark_mode_theme": None,
     "button_classes": {
         "primary": "btn-outline-primary",
         "secondary": "btn-outline-secondary",
-        "info": "btn-info",
-        "warning": "btn-warning",
+        "info": "btn-outline-info",
+        "warning": "btn-outline-warning",
         "danger": "btn-outline-danger",
         "success": "btn-outline-success"
     },
-    "actions_sticky_top": True
+    "actions_sticky_top": False
 }
