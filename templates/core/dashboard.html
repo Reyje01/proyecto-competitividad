@@ -29,11 +29,6 @@
     select.form-control {
         border-radius: 0.25rem;
     }
-    .chart-container {
-        position: relative;
-        height: 320px;
-        width: 100%;
-    }
     .panel {
         background: #f4f6f9;
         border-radius: 0.5rem;
@@ -46,6 +41,17 @@
         font-weight: 600;
         margin-bottom: 1rem;
         color: #343a40;
+    }
+    .panel-flex {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 20px;
+    }
+    .chart-container {
+        flex: 1;
+        min-width: 300px;
+        height: 320px;
+        position: relative;
     }
 </style>
 {% endblock %}
@@ -70,23 +76,39 @@
     {{ data_indicador|json_script:"dataIndicador" }}
     {{ data_pilar|json_script:"dataPilar" }}
     {{ data_general|json_script:"dataGeneral" }}
+    {{ radar_data|json_script:"radarData" }}
 
     <div class="panel">
         <h3>Índice Indicador</h3>
-        <div class="chart-container">
-            <canvas id="chartIndiceIndicador"></canvas>
+        <div class="panel-flex">
+            <div class="chart-container">
+                <canvas id="chartIndiceIndicador"></canvas>
+            </div>
+            <div class="chart-container">
+                <canvas id="chartRadarIndicador"></canvas>
+            </div>
         </div>
     </div>
     <div class="panel">
         <h3>Índice Pilar</h3>
-        <div class="chart-container">
-            <canvas id="chartIndicePilar"></canvas>
+        <div class="panel-flex">
+            <div class="chart-container">
+                <canvas id="chartIndicePilar"></canvas>
+            </div>
+            <div class="chart-container">
+                <canvas id="chartRadarPilar"></canvas>
+            </div>
         </div>
     </div>
     <div class="panel">
         <h3>Índice General</h3>
-        <div class="chart-container">
-            <canvas id="chartIndiceGeneral"></canvas>
+        <div class="panel-flex">
+            <div class="chart-container">
+                <canvas id="chartIndiceGeneral"></canvas>
+            </div>
+            <div class="chart-container">
+                <canvas id="chartRadarGeneral"></canvas>
+            </div>
         </div>
     </div>
 </div>
@@ -94,20 +116,16 @@
 
 {% block extrahead %}
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<script>
-$(document).ready(function() {
-    $('select').change(function() {
-        $('#filterForm').submit();
-    });
-});
-</script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
-function createChart(elementId, dataId, label, color) {
+let charts = {};
+
+function updateChart(elementId, data, label, color, type = "line") {
     const ctx = document.getElementById(elementId).getContext('2d');
-    const data = JSON.parse(document.getElementById(dataId).textContent);
-    new Chart(ctx, {
-        type: 'line',
+    if (charts[elementId]) charts[elementId].destroy();
+
+    charts[elementId] = new Chart(ctx, {
+        type: type,
         data: {
             labels: data.labels,
             datasets: [{
@@ -115,14 +133,15 @@ function createChart(elementId, dataId, label, color) {
                 data: data.values,
                 backgroundColor: `rgba(${color}, 0.1)`,
                 borderColor: `rgba(${color}, 1)`,
+                pointBackgroundColor: `rgba(${color}, 1)`,
                 borderWidth: 2,
-                tension: 0.3,
-                fill: true
+                tension: type === 'line' ? 0.3 : 0
             }]
         },
         options: {
             responsive: true,
-            scales: {
+            maintainAspectRatio: false,
+            scales: type === 'radar' ? {} : {
                 y: { beginAtZero: true, title: { display: true, text: 'Valor del Índice' } },
                 x: { title: { display: true, text: 'Fecha' } }
             }
@@ -130,10 +149,29 @@ function createChart(elementId, dataId, label, color) {
     });
 }
 
-document.addEventListener('DOMContentLoaded', function() {
-    createChart('chartIndiceIndicador', 'dataIndicador', 'Índice Indicador', '54, 162, 235');
-    createChart('chartIndicePilar', 'dataPilar', 'Índice Pilar', '255, 99, 132');
-    createChart('chartIndiceGeneral', 'dataGeneral', 'Índice General', '75, 192, 192');
+function fetchDashboardData() {
+    const params = new URLSearchParams(new FormData(document.getElementById("filterForm"))).toString();
+    fetch(`/admin/dashboard/api/?${params}`)
+        .then(res => res.json())
+        .then(data => {
+            // Actualizar gráficas de línea
+            updateChart("chartIndiceIndicador", data.data_indicador, "Índice Indicador", "54, 162, 235");
+            updateChart("chartIndicePilar", data.data_pilar, "Índice Pilar", "255, 99, 132");
+            updateChart("chartIndiceGeneral", data.data_general, "Índice General", "75, 192, 192");
+
+            // Actualizar gráficas de radar (solo afectadas por unidad de análisis correspondiente)
+            updateChart("chartRadarIndicador", data.radar_data_indicador, "Perfil Indicador", "54, 162, 235", "radar");
+            updateChart("chartRadarPilar", data.radar_data_pilar, "Perfil Pilar", "255, 99, 132", "radar");
+            updateChart("chartRadarGeneral", data.radar_data_general, "Perfil General", "75, 192, 192", "radar");
+        })
+        .catch(err => console.error("Error cargando dashboard:", err));
+}
+
+document.addEventListener("DOMContentLoaded", function () {
+    document.querySelectorAll("#filterForm select").forEach(select => {
+        select.addEventListener("change", fetchDashboardData);
+    });
+    fetchDashboardData();
 });
 </script>
 {% endblock %}
